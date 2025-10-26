@@ -3,10 +3,9 @@ import java.util.ArrayList;
 
 public class RigidBody {
     //i could turn x and y into a point from point class but eh
-    private double x;
-    private double y;
+    private Point position;
 
-    private int radius;
+    private int diam;
 
     private Vector velocity;
     private Vector acceleration;
@@ -16,11 +15,10 @@ public class RigidBody {
     private double mass;
 
     private boolean drawForce = true;
-    RigidBody(int radius, int mass) {
-        this.radius = radius;
+    RigidBody(int diam, int mass) {
+        this.diam = diam;
         this.mass = mass;
-        x = 100;
-        y = 0;
+        position = new Point(180, 0);
 
         velocity = new Vector(0, 0);
         acceleration = new Vector(0, 0);
@@ -36,10 +34,13 @@ public class RigidBody {
 
     }
 
+    public String toString() {
+        return  "RigidBody: " + position.getX() + ", " + position.getY();
+    }
+
     public void drawSelf(Graphics2D g2d){
         g2d.setColor(Color.black);
-        g2d.fillOval((int) x, (int) y, radius, radius);
-        g2d.drawOval((int)x, (int)y, radius, radius);
+        g2d.fillOval((int) position.getX(), (int) position.getY(), diam, diam);
 
         if(drawForce){
             drawForces(g2d);
@@ -49,12 +50,11 @@ public class RigidBody {
     private void drawForces(Graphics2D g2d){
         g2d.setStroke(new BasicStroke(2));
         g2d.setColor(Color.RED);
-        double cX = x + radius/2.0;
-        double cY = y + radius/2.0;
+        double cX = getCenterX();
+        double cY = getCenterY();
 
 
         for(Vector f : forces){
-            System.out.println(f);
             VisualVector visualVector = f.getVisualVector();
             g2d.drawLine((int)cX, (int)cY, (int)(cX + visualVector.getX()), (int)(cY + visualVector.getY()));
         }
@@ -69,8 +69,7 @@ public class RigidBody {
         findAcceleration();
         velocity.add(acceleration);
 
-        x += velocity.getX();
-        y += velocity.getY();
+        position.translate(velocity.getX(), velocity.getY());
     }
 
     private void findFNet(){
@@ -83,10 +82,10 @@ public class RigidBody {
     }
 
     public double getCenterX(){
-        return x + radius/2.0;
+        return position.getX() + diam/2.0;
     }
     public double getCenterY(){
-        return y + radius/2.0;
+        return position.getY() + diam/2.0;
     }
 
     private void findAcceleration(){
@@ -95,12 +94,29 @@ public class RigidBody {
         acceleration = new Vector(fNet.getX()/mass, fNet.getY()/mass);
     }
 
+
+    public boolean isCollidingWithLine( LineSegment l1){
+        return l1.distanceToPoint(getCenter()) < diam/2.0;
+    }
+
     public void addForce(Vector v){
         forces.add(v);
     }
 
     private void removeForce(Vector v){
         forces.remove(v);
+    }
+
+    public double getRadius(){
+        return diam/2.0;
+    }
+
+    public Point getPosition(){
+        return position;
+    }
+
+    public Point getCenter(){
+        return new Point(getCenterX(), getCenterY());
     }
 
 }

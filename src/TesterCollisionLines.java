@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-public class TesterRigidBodyLines extends JComponent implements KeyListener, MouseListener, MouseMotionListener {
+public class TesterCollisionLines extends JComponent implements KeyListener, MouseListener, MouseMotionListener {
 
     //todo ask suriel how do I declutter this where should I handle certain things and where/how
     //I want to avoid the million lines of code that was in my last driver for intro (show it)
@@ -21,9 +21,10 @@ public class TesterRigidBodyLines extends JComponent implements KeyListener, Mou
 
     private RigidBody rigidBody;
 
-    private ArrayList<Line> lines = new ArrayList<Line>();
+    private ArrayList<Line> lines;
+    private LineSegment lineSegment;
 
-    public TesterRigidBodyLines() {
+    public TesterCollisionLines() {
 
         JFrame gui = new JFrame();
         gui.setDefaultCloseOperation(3);
@@ -39,8 +40,8 @@ public class TesterRigidBodyLines extends JComponent implements KeyListener, Mou
         gui.addMouseMotionListener(this);
 
         rigidBody = new RigidBody(20, 500);
-
-        //figure out collision
+        lines = new ArrayList<>();
+        lineSegment = new LineSegment(new Point(50,200), new Point(200,100));
     }
 
     public void keyPressed(KeyEvent e) {
@@ -51,15 +52,19 @@ public class TesterRigidBodyLines extends JComponent implements KeyListener, Mou
         Graphics2D g2d = (Graphics2D) g;
         rigidBody.drawSelf(g2d);
 
-        g2d.setColor(Color.BLACK);
-        for(Line l : lines) {
+        for(Line l : lines){
             l.drawSelf(g2d);
         }
+
+        lineSegment.drawSelf(g2d);
     }
 
     public void loop() {
         rigidBody.update();
 
+        //if(rigidBody.isCollidingWithLine(lineSegment)){
+          //  System.out.println("hello");
+        //}
         this.repaint();
     }
 
@@ -77,6 +82,8 @@ public class TesterRigidBodyLines extends JComponent implements KeyListener, Mou
     }
 
     public void mouseReleased(MouseEvent e) {
+        startPoint = null;
+        endPoint = null;
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -91,11 +98,23 @@ public class TesterRigidBodyLines extends JComponent implements KeyListener, Mou
     public void mouseMoved(MouseEvent e) {
     }
 
+    Point startPoint;
+    Point endPoint;
     public void mouseDragged(MouseEvent e) {
-        if(timer % 7 == 0) {
-            Line currentLine = lines.getLast();
-            Point tempPoint = new Point(e.getX() - 2, e.getY()-30);
-            currentLine.addPoint(tempPoint);
+        if(timer % 15 == 0) {
+            //if point is not initialized do it, if it is do the other, if they are both init then make a line segment then reset point values
+            //this is like a loop if first initalize first point then loop second if statement
+            if(startPoint == null){
+                startPoint = new Point(e.getX() - 2, e.getY() - 30);
+            }
+            else if(endPoint == null){
+                endPoint = new Point(e.getX() - 2, e.getY() - 30);
+                LineSegment currentLineSeg = new LineSegment(startPoint, endPoint);
+                lines.getLast().addSegment(currentLineSeg);
+
+                startPoint = endPoint;
+                endPoint = null;
+            }
         }
 
         timer++;
@@ -105,7 +124,7 @@ public class TesterRigidBodyLines extends JComponent implements KeyListener, Mou
         Thread gameThread = new Thread() {
             public void run() {
                 while(true) {
-                    TesterRigidBodyLines.this.loop();
+                    TesterCollisionLines.this.loop();
 
                     try {
                         Thread.sleep((long)(1000 / ticks));
@@ -119,7 +138,7 @@ public class TesterRigidBodyLines extends JComponent implements KeyListener, Mou
     }
 
     public static void main(String[] args) {
-        TesterRigidBodyLines g = new TesterRigidBodyLines();
+        TesterCollisionLineSegment g = new TesterCollisionLineSegment();
         g.start(60);
     }
 }

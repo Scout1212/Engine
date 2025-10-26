@@ -2,33 +2,66 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Line {
+    //really only serves to draw the line --> maybe I can add other things
     //stuff that a rigidbody can interact with
-    ArrayList<Point> points;
+    ArrayList<LineSegment> lineSegments;
+    Color color;
     int thickness;
 
 
-    public Line(ArrayList<Point> points) {
-        this.points = points;
-        thickness = 2;
+    public Line(ArrayList<LineSegment> lineSegments, int thickness) {
+        this.lineSegments = lineSegments;
+        this.thickness = thickness;
+
+        color = Color.BLACK;
     }
 
     public Line(){
-        this.points = new ArrayList<>();
-        thickness = 2;
+        this.lineSegments = new ArrayList<>();
+        thickness = 3;
+        color = Color.BLACK;
     }
 
-    public void addPoint(Point point){
-        this.points.add(point);
+    @Override
+    public String toString() {
+        return "Line with Segments: "  + lineSegments.size();
     }
 
-    public void drawSelf(Graphics2D graphics2D){
-        graphics2D.setStroke(new BasicStroke(thickness));
+    public void addSegment(LineSegment lineSegment){
+        lineSegments.add(lineSegment);
+    }
 
-        for(int i = 0; i < points.size() - 1; i++){
-            Point p1 = points.get(i);
-            Point p2 = points.get(i + 1);
+    public void drawSelf(Graphics2D g2d){
+        g2d.setStroke(new BasicStroke(thickness));
+        g2d.setColor(color);
 
-            graphics2D.drawLine((int)p1.getX(), (int)p1.getY(), (int)p2.getX(), (int)p2.getY());
+        for(int i = 0; i < lineSegments.size() - 1; i++){
+            lineSegments.get(i).drawSelf(g2d);
         }
+    }
+
+    /*
+    public ArrayList<LineSegment> sortFromDistanceToPoint(ArrayList<LineSegment> lineSegments, Point p){
+        ArrayList<LineSegment> output = lineSegments;
+        int n = output.size();
+        for (int i = 1; i < n; i++) {
+            LineSegment currentLineSeg = output.get(i);
+            double key = currentLineSeg.distanceToPoint(p);
+            int j = i - 1;
+
+            while (j >= 0 && lineSegments.get(i).distanceToPoint(p) > key) {
+                output.set(j + 1, lineSegments.get(j));
+                j = j - 1;
+            }
+
+            output.set(j + 1, currentLineSeg);
+        }
+
+        return output;
+    }
+     */
+
+    public ArrayList<LineSegment> getLineSegments(){
+        return lineSegments;
     }
 }
