@@ -1,3 +1,9 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -8,27 +14,19 @@ import java.util.ArrayList;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-public class TesterCollisionLines extends JComponent implements KeyListener, MouseListener, MouseMotionListener {
-
-    //todo ask suriel how do I declutter this where should I handle certain things and where/how
-    //I want to avoid the million lines of code that was in my last driver for intro (show it)
-    //It doesnt make sense to do collision and manage a lot of things in driver --> I think it should just be set up and go
-    //like initialize a couple of variables maybe call some methods but thats it
-
-
+public class TesterLineCollision extends JComponent implements KeyListener, MouseListener, MouseMotionListener {
     private int WIDTH = 800;
     private int HEIGHT = 800;
 
+    private ArrayList<Line> lines;
+    private ArrayList<CollisionLine> collisionLines;
+
     private RigidBody rigidBody;
 
-    private ArrayList<Line> lines;
-    private LineSegment lineSegment;
-
-    public TesterCollisionLines() {
-
+    public TesterLineCollision() {
         JFrame gui = new JFrame();
         gui.setDefaultCloseOperation(3);
-        gui.setTitle("TesterRigidBodyLines");
+        gui.setTitle("TesterLine");
         gui.setPreferredSize(new Dimension(this.WIDTH + 5, this.HEIGHT + 30));
         gui.setResizable(false);
         gui.getContentPane().add(this);
@@ -38,10 +36,9 @@ public class TesterCollisionLines extends JComponent implements KeyListener, Mou
         gui.addKeyListener(this);
         gui.addMouseListener(this);
         gui.addMouseMotionListener(this);
-
-        rigidBody = new RigidBody(20, 500);
         lines = new ArrayList<>();
-        lineSegment = new LineSegment(new Point(50,200), new Point(200,100));
+        collisionLines = new ArrayList<>();
+        rigidBody = new RigidBody(30, 10);
     }
 
     public void keyPressed(KeyEvent e) {
@@ -52,19 +49,26 @@ public class TesterCollisionLines extends JComponent implements KeyListener, Mou
         Graphics2D g2d = (Graphics2D) g;
         rigidBody.drawSelf(g2d);
 
-        for(Line l : lines){
-            l.drawSelf(g2d);
+        if(lines != null) {
+            for (Line l : lines) {
+                l.drawSelf(g2d);
+            }
         }
 
-        lineSegment.drawSelf(g2d);
+        //System.out.println("Collision Lines: " + collisionLines);
+        if(collisionLines != null) {
+            for (CollisionLine cl : collisionLines) {
+                cl.drawSelf(g2d);
+            }
+        }
     }
 
     public void loop() {
         rigidBody.update();
 
-        //if(rigidBody.isCollidingWithLine(lineSegment)){
-          //  System.out.println("hello");
-        //}
+        for(CollisionLine cl: collisionLines){
+            cl.isCollidingRigidBody(rigidBody);
+        }
         this.repaint();
     }
 
@@ -75,15 +79,18 @@ public class TesterCollisionLines extends JComponent implements KeyListener, Mou
 
     }
 
-    int timer =  0;
+
+    int timer = 0;
     public void mousePressed(MouseEvent e) {
+        timer =  0;
         lines.add(new Line());
-        timer = 0;
     }
 
     public void mouseReleased(MouseEvent e) {
-        startPoint = null;
+        collisionLines.add(lines.getLast().getCollisionLine());
+
         endPoint = null;
+        startPoint = null;
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -96,16 +103,16 @@ public class TesterCollisionLines extends JComponent implements KeyListener, Mou
     }
 
     public void mouseMoved(MouseEvent e) {
+
     }
 
     Point startPoint;
     Point endPoint;
     public void mouseDragged(MouseEvent e) {
-        if(timer % 15 == 0) {
+        if(timer % 4 == 0) {
             //if point is not initialized do it, if it is do the other, if they are both init then make a line segment then reset point values
-            //this is like a loop if first initalize first point then loop second if statement
             if(startPoint == null){
-                startPoint = new Point(e.getX() - 2, e.getY() - 30);
+                startPoint = new Point(e.getX()-2, e.getY() - 30);
             }
             else if(endPoint == null){
                 endPoint = new Point(e.getX() - 2, e.getY() - 30);
@@ -124,7 +131,7 @@ public class TesterCollisionLines extends JComponent implements KeyListener, Mou
         Thread gameThread = new Thread() {
             public void run() {
                 while(true) {
-                    TesterCollisionLines.this.loop();
+                    TesterLineCollision.this.loop();
 
                     try {
                         Thread.sleep((long)(1000 / ticks));
@@ -138,7 +145,7 @@ public class TesterCollisionLines extends JComponent implements KeyListener, Mou
     }
 
     public static void main(String[] args) {
-        TesterCollisionLineSegment g = new TesterCollisionLineSegment();
+        TesterLineCollision g = new TesterLineCollision();
         g.start(60);
     }
 }

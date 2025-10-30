@@ -2,6 +2,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class RigidBody {
+    public double getDiam;
     //i could turn x and y into a point from point class but eh
     private Point position;
 
@@ -45,6 +46,9 @@ public class RigidBody {
         if(drawForce){
             drawForces(g2d);
         }
+
+        Rectangle bound = getBoundingBox();
+        bound.drawSelf(g2d, false);
     }
 
     private void drawForces(Graphics2D g2d){
@@ -94,9 +98,10 @@ public class RigidBody {
         acceleration = new Vector(fNet.getX()/mass, fNet.getY()/mass);
     }
 
-
-    public boolean isCollidingWithLine( LineSegment l1){
-        return l1.distanceToPoint(getCenter()) < diam/2.0;
+    public Point getNextPosition(){
+        Point nextPosition = position;
+        nextPosition.translate(velocity.getX(), velocity.getY());
+        return nextPosition;
     }
 
     public void addForce(Vector v){
@@ -117,6 +122,14 @@ public class RigidBody {
 
     public Point getCenter(){
         return new Point(getCenterX(), getCenterY());
+    }
+
+    public int getDiam(){
+        return diam;
+    }
+
+    public Rectangle getBoundingBox(){
+        return new Rectangle(new Point(position.getX() - diam/2.0, position.getY() - diam/2.0), diam * 2, diam *2);
     }
 
 }

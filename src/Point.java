@@ -1,3 +1,4 @@
+//point class is just a point its a basic building block
 public class Point {
     private double x;
     private double y;
@@ -8,7 +9,7 @@ public class Point {
     }
 
     public String toString() {
-        return  "Point: " + x + ", " + y;
+        return  "Point: (" + x + ", " + y + ")";
     }
 
     public double distance(Point p){
