@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 //The idea is that a ColllisionSegment is a rough version of the line segment
 //it holds a bunch of line segments but tries to generalize them into a couple lines
 //only when the ball gets close enough will it reveal the little segments and let the line through
@@ -8,13 +10,19 @@ public class CollisionSegment extends LineSegment {
         this.subLine = subline;
     }
 
-    @Override
-    public boolean isCollidingRigidBody(RigidBody r) {
+    /**
+     * The second level of collision checking, does collision from general lines (this) to particle:
+     * if touching then it passes it down to the subline (the line on screen): Line.isCollidingRigidBody();
+     * @return Collided LineSegments, if no collision then EmptyArrayList
+     */
+    public ArrayList<LineSegment> getCollidedLineSegment(Particle r) {
+        ArrayList<LineSegment> collidedSegment = new ArrayList<>();
+
         if(super.isCollidingRigidBody(r)){
             System.out.println("collided with with Collision line");
-            return subLine.isCollidingRigidBody(r);
+            collidedSegment.addAll(subLine.getCollidedLineSegments(r));
         }
 
-        return false;
+        return collidedSegment;
     }
 }

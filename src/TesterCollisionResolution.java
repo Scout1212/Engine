@@ -1,26 +1,30 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
+
 import java.awt.*;
-import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-public class TesterForce extends JComponent implements KeyListener, MouseListener, MouseMotionListener {
+public class TesterCollisionResolution extends JComponent implements KeyListener, MouseListener, MouseMotionListener {
     private int WIDTH = 800;
     private int HEIGHT = 800;
 
-    private Particle particle;
+    private Line line;
+    private Particle particle = new Particle(100, 10);
 
-   private Point[] line;
-
-    public TesterForce() {
-
+    public TesterCollisionResolution() {
         JFrame gui = new JFrame();
         gui.setDefaultCloseOperation(3);
-        gui.setTitle("TesterForce");
+        gui.setTitle("TesterCollisionResolution");
         gui.setPreferredSize(new Dimension(this.WIDTH + 5, this.HEIGHT + 30));
         gui.setResizable(false);
         gui.getContentPane().add(this);
@@ -30,27 +34,28 @@ public class TesterForce extends JComponent implements KeyListener, MouseListene
         gui.addKeyListener(this);
         gui.addMouseListener(this);
         gui.addMouseMotionListener(this);
-
-        particle = new Particle(20, 500);
-
-        //figure out collision
+        particle = new Particle(30, 10);
+        line = new Line();
+        line.addSegment(new LineSegment(new Point(100,200), new Point(200, 400)));
+        line.addSegment(new LineSegment(new Point(200,400), new Point(300, 200)));
     }
 
     public void keyPressed(KeyEvent e) {
 
     }
 
+    //next problem find out the angle that it hit the thing at
+
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         particle.drawSelf(g2d);
+        line.drawSelf(g2d);
 
-        if(line != null) {
-            g2d.drawLine((int)line[0].getX(), (int)line[0].getY(), (int)line[1].getX(), (int)line[1].getY());
-        }
     }
 
     public void loop() {
         particle.update();
+
 
         this.repaint();
     }
@@ -63,21 +68,9 @@ public class TesterForce extends JComponent implements KeyListener, MouseListene
     }
 
     public void mousePressed(MouseEvent e) {
-        line = new Point[]{new Point(e.getX() - 2, e.getY() - 30), new Point(e.getX() - 2, e.getY() - 30)};
     }
 
     public void mouseReleased(MouseEvent e) {
-        //todo figure out where to inverse to account for inverted y axis in screen class --> why is it already accounted for and working?
-        //I didnt inverse anything so why work
-
-        Point p1 = line[0];
-        Point p2 = new Point(e.getX() - 2, e.getY() - 30);
-        //calculating a line to apply force to the object
-
-
-        VisualVector mouseForceVector = new VisualVector((int)(p2.getX() - p1.getX()), (int)(p2.getY() - p1.getY()));
-        particle.addForce(mouseForceVector.getVector());
-        line = null;
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -90,17 +83,17 @@ public class TesterForce extends JComponent implements KeyListener, MouseListene
     }
 
     public void mouseMoved(MouseEvent e) {
-    }
 
+    }
+    
     public void mouseDragged(MouseEvent e) {
-        line [1] = new Point(e.getX() - 2, e.getY() - 30);
     }
 
     public void start(final int ticks) {
         Thread gameThread = new Thread() {
             public void run() {
                 while(true) {
-                    TesterForce.this.loop();
+                    TesterCollisionResolution.this.loop();
 
                     try {
                         Thread.sleep((long)(1000 / ticks));
@@ -114,7 +107,7 @@ public class TesterForce extends JComponent implements KeyListener, MouseListene
     }
 
     public static void main(String[] args) {
-        TesterForce g = new TesterForce();
+        TesterCollisionResolution g = new TesterCollisionResolution();
         g.start(60);
     }
 }

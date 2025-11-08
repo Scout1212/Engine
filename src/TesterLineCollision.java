@@ -21,7 +21,7 @@ public class TesterLineCollision extends JComponent implements KeyListener, Mous
     private ArrayList<Line> lines;
     private ArrayList<CollisionLine> collisionLines;
 
-    private RigidBody rigidBody;
+    private Particle particle;
 
     public TesterLineCollision() {
         JFrame gui = new JFrame();
@@ -38,16 +38,18 @@ public class TesterLineCollision extends JComponent implements KeyListener, Mous
         gui.addMouseMotionListener(this);
         lines = new ArrayList<>();
         collisionLines = new ArrayList<>();
-        rigidBody = new RigidBody(30, 10);
+        particle = new Particle(30, 10);
     }
 
     public void keyPressed(KeyEvent e) {
 
     }
 
+    //next problem find out the angle that it hit the thing at
+    ArrayList<LineSegment> collided = null;
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        rigidBody.drawSelf(g2d);
+        particle.drawSelf(g2d);
 
         if(lines != null) {
             for (Line l : lines) {
@@ -61,14 +63,29 @@ public class TesterLineCollision extends JComponent implements KeyListener, Mous
                 cl.drawSelf(g2d);
             }
         }
+
+
+        for(CollisionLine cl: collisionLines){
+            ArrayList<LineSegment> collided = cl.getCollidedLineSegments(particle);
+            if(!collided.isEmpty()) {
+                this.collided = collided;
+            }
+
+        }
+
+        if(collided != null) {
+            for(LineSegment l : collided) {
+                g2d.setColor(Color.green);
+                l.drawSelf(g2d);
+            }
+        }
     }
 
     public void loop() {
-        rigidBody.update();
+        particle.update();
 
-        for(CollisionLine cl: collisionLines){
-            cl.isCollidingRigidBody(rigidBody);
-        }
+        //because this doesnt break early it actually checks with how many lines are colliding with the objec
+
         this.repaint();
     }
 

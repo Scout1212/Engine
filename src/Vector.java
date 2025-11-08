@@ -11,13 +11,11 @@ public class Vector {
         angle = (int)Math.atan2(y, x);
     }
 
-    /*
-    comment this out for now because its getting annoying differentiating between the two constructors
-    Vector(double length, int angle){
-        resultant = new double[]{length * Math.sin(Math.toRadians(angle)), length * Math.cos(Math.toRadians(angle))};
+    Vector(double length, int angle) {
+        resultant = new Point(length * Math.sin(Math.toRadians(angle)), length * Math.cos(Math.toRadians(angle)));
         magnitude = length;
         this.angle = angle;
-    */
+    }
 
     @Override
     public String toString() {
@@ -46,5 +44,9 @@ public class Vector {
 
     public  VisualVector getVisualVector(){
         return new VisualVector(this);
+    }
+
+    public Vector getRotatedVector(double angle){
+        return new Vector(magnitude, angle);
     }
 }

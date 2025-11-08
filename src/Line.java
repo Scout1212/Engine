@@ -1,6 +1,9 @@
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
+//line holds an arrayList of line segments
 public class Line {
     //really only serves to draw the line --> maybe I can add other things
     //stuff that a rigidbody can interact with
@@ -35,33 +38,40 @@ public class Line {
         g2d.setStroke(new BasicStroke(thickness));
         g2d.setColor(color);
 
-        for(int i = 0; i < lineSegments.size() - 1; i++){
+        for(int i = 0; i < lineSegments.size(); i++){
             lineSegments.get(i).drawSelf(g2d);
         }
     }
 
-    /*
-    public ArrayList<LineSegment> sortFromDistanceToPoint(ArrayList<LineSegment> lineSegments, Point p){
-        ArrayList<LineSegment> output = lineSegments;
-        int n = output.size();
-        for (int i = 1; i < n; i++) {
-            LineSegment currentLineSeg = output.get(i);
-            double key = currentLineSeg.distanceToPoint(p);
-            int j = i - 1;
-
-            while (j >= 0 && lineSegments.get(i).distanceToPoint(p) > key) {
-                output.set(j + 1, lineSegments.get(j));
-                j = j - 1;
-            }
-
-            output.set(j + 1, currentLineSeg);
-        }
-
-        return output;
-    }
-     */
-
     public ArrayList<LineSegment> getLineSegments(){
         return lineSegments;
+    }
+
+    public void addLineSegment(LineSegment lineSegment){
+        lineSegments.add(lineSegment);
+    }
+
+
+
+    public CollisionLine getCollisionLine(){
+        return new CollisionLine(this);
+    }
+
+    //how am I going to handle this with the priority queue
+    //where am I going to store each Priority queue for each match of ball and line
+
+    /**
+     *Last level of collision checking, checks collision between all of its lineSegments and particle
+     * @return Collided LineSegment, if no collision then null
+     */
+    public ArrayList<LineSegment> getCollidedLineSegments(Particle r1){
+        ArrayList<LineSegment> collidedSegments = new ArrayList<>();
+        for(LineSegment lineSeg : lineSegments){
+            if(lineSeg.isCollidingRigidBody(r1)) {
+                collidedSegments.add(lineSeg);
+            }
+        }
+
+        return collidedSegments;
     }
 }

@@ -18,7 +18,7 @@ public class TesterLine extends JComponent implements KeyListener, MouseListener
     private int WIDTH = 800;
     private int HEIGHT = 800;
 
-    private Line line;
+    private Line line =  new Line();
 
     public TesterLine() {
         JFrame gui = new JFrame();
@@ -82,14 +82,14 @@ public class TesterLine extends JComponent implements KeyListener, MouseListener
     Point startPoint;
     Point endPoint;
     public void mouseDragged(MouseEvent e) {
-        if(timer % 7 == 0) {
+        if(timer % 2 == 0) {
             //if point is not initialized do it, if it is do the other, if they are both init then make a line segment then reset point values
-            //this is like a loop if first initalize first point then loop second if statement
+            //now that I think about
             if(startPoint == null){
-                startPoint = new Point(e.getX(), e.getY());
+                startPoint = new Point(e.getX()-2, e.getY() - 30);
             }
             else if(endPoint == null){
-                endPoint = new Point(e.getX(), e.getY());
+                endPoint = new Point(e.getX() - 2, e.getY() - 30);
                 LineSegment currentLineSeg = new LineSegment(startPoint, endPoint);
                 line.addSegment(currentLineSeg);
 

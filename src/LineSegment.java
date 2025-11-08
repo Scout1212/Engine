@@ -15,32 +15,22 @@ public class LineSegment {
     }
 
     public double findSlope(Point p1, Point p2) {
-        double dx;
-        double dy;
-
-        if(p2.getX() > p1.getX()) {
-            dx = p2.getX()-p1.getX();
-            dy = p2.getY()-p1.getY();
-        }
-        else{
-            dx = p1.getX()-p2.getX();
-            dy = p1.getY()-p2.getY();
-        }
-
-        return dy/dx;
+        return (p1.getX()-p2.getX())/(p1.getY() - p2.getY());
     }
 
+    //I decided to make this double since I need it to be that way for my get priority queue method to work
+    //It also maybe make sense since this is a just a formula only doing calculations
     public double distanceToPoint(Point p1) {
         //we want to make a triangle to check if the angles are acute
 
         //the line segment
-        double cSquare = Math.pow(distance, 2);
+        double cSquare = Math.pow(getDistance(), 2);
 
         //the two legs I want the thetas of (leg and segment)
 
-        double a = p1.distance(end);
-        double b = p1.distance(start);
-        double c = distance;
+        double a = p1.distance(getEnd());
+        double b = p1.distance(getStart());
+        double c = getDistance();
 
         double aSquare = Math.pow(a, 2);
         double bSquare  = Math.pow(b, 2);
@@ -65,6 +55,11 @@ public class LineSegment {
         }
     }
 
+    public boolean isCollidingRigidBody(Particle r) {
+       return distanceToPoint(r.getCenter()) < r.getDiam()/2.0;
+    }
+
+
     public void drawSelf(Graphics2D g2d) {
         g2d.drawLine((int)start.getX(), (int)start.getY(), (int)end.getX(), (int)end.getY());
     }
@@ -75,6 +70,17 @@ public class LineSegment {
 
     public double getSlope(){
         return slope;
+    }
+
+    public double getDistance(){
+        return distance;
+    }
+
+    public Point getStart(){
+        return start;
+    }
+    public Point getEnd(){
+        return end;
     }
 
 }

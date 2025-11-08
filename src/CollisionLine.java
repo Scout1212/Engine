@@ -1,7 +1,7 @@
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 
+//does collision
 //holds the CollisionSegments
 public class CollisionLine extends Line{
 
@@ -18,7 +18,6 @@ public class CollisionLine extends Line{
         collisionSegments = new ArrayList<>();
         collisionSegments = generateCollisionLines(parentLine);
         collisionRectangle = generateBoundingBox();
-        System.out.println(collisionRectangle);
     }
 
     @Override
@@ -137,21 +136,32 @@ public class CollisionLine extends Line{
         return new Rectangle(topLeft, topRight, bottomLeft, bottomRight);
     }
 
-    public boolean isCollidingRigidBody(RigidBody r){
+    //at first this method just got if we collided --> it returned boolean
+    //but I realize eventually I might want to know what lineSegment I collided into to do some collision stuff with
+    /**
+     * The first level of collision checking, compares bounding boxes:
+     * if touching, it passes down collision check to the next level:
+     * CollisionSegment.isCollidingRigidBody(Particle r).
+     * @return Collided LineSegments, if no collision then empty ArrayList
+     */
+    public ArrayList<LineSegment> getCollidedLineSegments(Particle r){
         //on this upper level do is colliding with rectangle
         //if it is then do isCollisionSegment colliding with
+        ArrayList<LineSegment> collidedSegments = new ArrayList<>();
 
         if(collisionRectangle.isOverlapping(r.getBoundingBox())){
-            System.out.println("Inside box");
             //r is inside box
-            //if we are in box then we want now check all the collision segments to see if they're colliding
             for(CollisionSegment collisionSegment : collisionSegments){
-                if(collisionSegment.isCollidingRigidBody(r))
-                    return true;
+
+                ArrayList<LineSegment> collidedSegment = collisionSegment.getCollidedLineSegment(r);
+
+                if(!collidedSegment.isEmpty()) {
+                    collidedSegments.addAll(collidedSegment);
+                }
             }
         }
 
-        return false;
+        return collidedSegments;
     }
 
 }
