@@ -5,17 +5,15 @@ public class Particle {
     public double getDiam;
     //i could turn x and y into a point from point class but eh
     private Point position;
-
     private int diam;
-
     private Vector velocity;
     private Vector acceleration;
     private Vector fNet;
-
     private ArrayList<Vector> forces;
     private double mass;
-
+    private double bounciness;
     private boolean drawForce = true;
+    
     Particle(int diam, int mass) {
         this.diam = diam;
         this.mass = mass;
@@ -32,6 +30,8 @@ public class Particle {
 
         forces.add(new Vector(0, mass * PhysConst.GRAVITY*.1));
         //forces.add(new Vector(10, 0));
+
+        bounciness = .9;
 
     }
 
@@ -77,12 +77,7 @@ public class Particle {
     }
 
     private void findFNet(){
-        Vector sumForce = new Vector(0, 0);
-        for(Vector v : forces){
-            sumForce.add(v);
-        }
-
-        fNet = sumForce;
+        fNet = Vector.sumVectors(forces);
     }
 
     public double getCenterX(){
@@ -104,8 +99,29 @@ public class Particle {
         return nextPosition;
     }
 
-    public void resolveCollision(){
+    public void resolveCollision(ArrayList<LineSegment> segments){
+        LineSegment ls = segments.getFirst();
+        //seperateFromLine(ls);
+        //System.out.println(ls.getAngle());
+        double angle = ls.getAngle();
+        //System.out.println(Math.toDegrees(-angle));
+        System.out.println(velocity.getMagnitude());
+        Vector rotatedVelocity = velocity.getRotateVector(-angle);
+        //System.out.println(rotatedVelocity);
+        //System.out.println(Math.toDegrees(rotatedVelocity.getAngle()));
+        Vector RotatedReflectedVelocity = new Vector(rotatedVelocity.getX() * bounciness, rotatedVelocity.getY() * bounciness * -1);
+        velocity = RotatedReflectedVelocity.getRotateVector(angle);
+        //System.out.println(velocity);
+    }
 
+    public void seperateFromLine(LineSegment ls){
+        double normalAngle = ls.getNormalAngle();
+        double distanceBetweenPointLine = ls.distanceToPoint(getCenter()) + 1;
+        setPosition(new Point(position.getX() + distanceBetweenPointLine * Math.cos(normalAngle), position.getY() - distanceBetweenPointLine * Math.sin(normalAngle)));
+    }
+
+    public void setPosition(Point p){
+        position = p;
     }
 
     public void addForce(Vector v){

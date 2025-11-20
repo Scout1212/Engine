@@ -19,10 +19,11 @@ public class CollisionSegment extends LineSegment {
         ArrayList<LineSegment> collidedSegment = new ArrayList<>();
 
         if(super.isCollidingRigidBody(r)){
-            System.out.println("collided with with Collision line");
             collidedSegment.addAll(subLine.getCollidedLineSegments(r));
         }
 
         return collidedSegment;
     }
+    //todo when doing the calculation for line colliding into collision line --> its doing point and point collision with the point closest to the line, turn it into circle and point collision with the diameter being the
+    //distance between the point on the collision line and the furthest point on the actual line,
 }

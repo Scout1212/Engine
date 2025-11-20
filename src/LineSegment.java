@@ -11,11 +11,10 @@ public class LineSegment {
         this.end = end;
         slope = findSlope(start, end);
         distance = start.distance(end);
-
     }
 
-    public double findSlope(Point p1, Point p2) {
-        return (p1.getX()-p2.getX())/(p1.getY() - p2.getY());
+    public static double findSlope(Point p1, Point p2) {
+        return ((p1.getX()-p2.getX())*10)/((p1.getY() - p2.getY())*10);
     }
 
     //I decided to make this double since I need it to be that way for my get priority queue method to work
@@ -42,10 +41,10 @@ public class LineSegment {
 
         //if either angle is obtuse that means p1 is not between the points of the line segment and so the distance
         //to the line segment is just a simple p1 to the side thats obtuse or right --> just draw it out
-        if(Math.toDegrees(aTheta) >= 90){
+        if(aTheta >= Math.PI/2){
             return b;
         }
-        else if(Math.toDegrees(bTheta) >= 90){
+        else if(bTheta >= Math.PI/2){
             return a;
         }
         else{
@@ -56,12 +55,30 @@ public class LineSegment {
     }
 
     public boolean isCollidingRigidBody(Particle r) {
-       return distanceToPoint(r.getCenter()) < r.getDiam()/2.0;
+       return distanceToPoint   (r.getCenter()) < r.getDiam()/2.0;
+    }
+
+    /**
+     * @return the acute angle between the two lines, quadrant ignored
+     */
+    public double getAcuteAngleBetweenLines(LineSegment l1){
+        double m1 = l1.getSlope();
+        double m2 = this.getSlope();
+
+        return Math.atan(Math.abs((m1-m2)/(1+m1*m2)));
     }
 
 
     public void drawSelf(Graphics2D g2d) {
         g2d.drawLine((int)start.getX(), (int)start.getY(), (int)end.getX(), (int)end.getY());
+    }
+
+    public double getAngle(){
+        return Math.atan2(end.getY() - start.getY(), end.getX() - start.getX());
+    }
+
+    public double getNormalAngle(){
+        return (getAngle() + Math.PI/2) % (2*Math.PI);
     }
 
     public double getPerpendicular(){
@@ -82,5 +99,6 @@ public class LineSegment {
     public Point getEnd(){
         return end;
     }
+
 
 }

@@ -1,20 +1,18 @@
+import java.util.ArrayList;
+
 public class Vector {
 
     private Point resultant;
-
-    private int angle;
     private double magnitude;
 
     Vector(double x, double y) {
         resultant = new Point(x, y);
         magnitude = findHyp(x, y);
-        angle = (int)Math.atan2(y, x);
     }
 
-    Vector(double length, int angle) {
-        resultant = new Point(length * Math.sin(Math.toRadians(angle)), length * Math.cos(Math.toRadians(angle)));
+    Vector(double length, double angle, String a) {
         magnitude = length;
-        this.angle = angle;
+        resultant = new Point(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
     }
 
     @Override
@@ -24,6 +22,7 @@ public class Vector {
 
     public void add(Vector v) {
         resultant.translate(v.resultant.getX(), v.resultant.getY());
+        magnitude = findHyp(resultant.getX(), resultant.getY());
     }
 
     public void sub(Vector v) {
@@ -38,6 +37,17 @@ public class Vector {
         return resultant.getY();
     }
 
+    /***
+     * @return the angle of above the horizonal in radians
+     */
+    public double getAngle(){
+        return Math.atan2(resultant.getY(), resultant.getX());
+    }
+
+    public double getMagnitude(){
+        return magnitude;
+    }
+
     public static double findHyp(double x, double y){
         return Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
     }
@@ -46,7 +56,21 @@ public class Vector {
         return new VisualVector(this);
     }
 
-    public Vector getRotatedVector(double angle){
-        return new Vector(magnitude, angle);
+    public Vector getRotateVector(double angle){
+        return new Vector(magnitude, getAngle() + angle, "");
+    }
+
+
+    public static Vector sumVectors(ArrayList<Vector> vectors){
+        Vector output = new Vector(0,0);
+        for(Vector v : vectors){
+            output.add(v);
+        }
+
+        return output;
+    }
+
+    public double getSlope() {
+        return resultant.getY() / resultant.getX();
     }
 }

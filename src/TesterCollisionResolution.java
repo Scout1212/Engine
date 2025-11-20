@@ -19,6 +19,7 @@ public class TesterCollisionResolution extends JComponent implements KeyListener
     private int HEIGHT = 800;
 
     private Line line;
+    private CollisionLine collisionLine;
     private Particle particle = new Particle(100, 10);
 
     public TesterCollisionResolution() {
@@ -36,8 +37,16 @@ public class TesterCollisionResolution extends JComponent implements KeyListener
         gui.addMouseMotionListener(this);
         particle = new Particle(30, 10);
         line = new Line();
+        line.addSegment(new LineSegment(new Point(100,200), new Point(200, 200)));
+        line.addSegment(new LineSegment(new Point(200,200), new Point(300, 250)));
+
+        collisionLine = line.getCollisionLine();
+
+        /*
+        this is for later to do collision when a particle hits multiple lines
         line.addSegment(new LineSegment(new Point(100,200), new Point(200, 400)));
         line.addSegment(new LineSegment(new Point(200,400), new Point(300, 200)));
+         */
     }
 
     public void keyPressed(KeyEvent e) {
@@ -50,12 +59,18 @@ public class TesterCollisionResolution extends JComponent implements KeyListener
         Graphics2D g2d = (Graphics2D) g;
         particle.drawSelf(g2d);
         line.drawSelf(g2d);
+        g2d.setColor(Color.RED);
+        collisionLine.drawSelf(g2d);
 
     }
 
     public void loop() {
         particle.update();
 
+        ArrayList<LineSegment> collidedLineSegments = collisionLine.getCollidedLineSegments(particle);
+        if(!collidedLineSegments.isEmpty()) {
+            particle.resolveCollision(collidedLineSegments);
+        }
 
         this.repaint();
     }
@@ -85,7 +100,7 @@ public class TesterCollisionResolution extends JComponent implements KeyListener
     public void mouseMoved(MouseEvent e) {
 
     }
-    
+
     public void mouseDragged(MouseEvent e) {
     }
 

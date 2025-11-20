@@ -8,6 +8,7 @@ public class CollisionLine extends Line{
     private Line parentLine;
     private ArrayList<CollisionSegment> collisionSegments;
     private Rectangle collisionRectangle;
+    private double distanceToFurtherPoint;
 
     private CollisionLine(Point p1, Point p2){
 
@@ -48,26 +49,32 @@ public class CollisionLine extends Line{
         //my goal is to check the slopes of each segment and whichever segment is different
 
         //find threshold later
-        int thresholdAngle = 25;
+        double thresholdAngle = Math.toRadians(50);
 
         for(int i = 0; i < lineSegments.size() - 1; i++){
             //the current LineSegment for comparison
             LineSegment currLineSeg = lineSegments.get(i);
+
+            //saving this point to use for the new line later
             Point start = currLineSeg.getStart();
 
-            //if you take slope and do atan you can get theta I think
-            double currSlopeAngle = Math.toDegrees(Math.atan(currLineSeg.getSlope()));
 
-            //second LineSegment for comparison
             int j = i + 1;
             LineSegment compareLineSeg = lineSegments.get(j);
-            double compareSlopeAngle = Math.toDegrees(Math.atan(currLineSeg.getSlope()));
 
+
+            //getting the second angle for comparison
+            double compareSlopeAngle = compareLineSeg.getAngle();
+            //getting the angle of the current lineSegment for comparison
+            double currSlopeAngle = currLineSeg.getAngle();
 
             //sliding window to compare the two line slopes
             while(Math.abs(currSlopeAngle - compareSlopeAngle) < thresholdAngle && j < lineSegments.size()){
                 compareLineSeg = lineSegments.get(j);
-                compareSlopeAngle = Math.toDegrees(Math.atan(compareLineSeg.getSlope()));
+                compareSlopeAngle = compareLineSeg.getAngle();
+
+                System.out.println("CurrentSlope angle = " + currSlopeAngle + " CompareSlope angle = " + compareSlopeAngle + " Difference = " + (currSlopeAngle - compareSlopeAngle));
+
                 j++;
             }
             //when we exit this while loop we will get the lineSegment with the different slope compared to the current line
@@ -90,8 +97,7 @@ public class CollisionLine extends Line{
         return collisionSegments;
     }
 
-    public Rectangle generateBoundingBox(){
-        //hopefully this works
+    private Rectangle generateBoundingBox(){
         double maxX = Integer.MIN_VALUE;
         double maxY = Integer.MIN_VALUE;
         double minX = Integer.MAX_VALUE;
@@ -103,28 +109,28 @@ public class CollisionLine extends Line{
             if(start.getX() > maxX){
                 maxX = start.getX();
             }
-            else if(start.getX() < minX){
+            if(start.getX() < minX){
                 minX = start.getX();
             }
 
             if(end.getX() > maxX){
                 maxX = end.getX();
             }
-            else if(end.getX() < minX){
+            if(end.getX() < minX){
                 minX = end.getX();
             }
 
             if(start.getY() > maxY){
                 maxY = start.getY();
             }
-            else if(start.getY() < minY){
+            if(start.getY() < minY){
                 minY = start.getY();
             }
 
             if(end.getY() > maxY){
                 maxY = end.getY();
             }
-            else if(end.getY() < minY){
+            if(end.getY() < minY){
                 minY = end.getY();
             }
         }

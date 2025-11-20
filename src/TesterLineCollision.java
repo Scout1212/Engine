@@ -64,15 +64,6 @@ public class TesterLineCollision extends JComponent implements KeyListener, Mous
             }
         }
 
-
-        for(CollisionLine cl: collisionLines){
-            ArrayList<LineSegment> collided = cl.getCollidedLineSegments(particle);
-            if(!collided.isEmpty()) {
-                this.collided = collided;
-            }
-
-        }
-
         if(collided != null) {
             for(LineSegment l : collided) {
                 g2d.setColor(Color.green);
@@ -84,7 +75,12 @@ public class TesterLineCollision extends JComponent implements KeyListener, Mous
     public void loop() {
         particle.update();
 
-        //because this doesnt break early it actually checks with how many lines are colliding with the objec
+        for(CollisionLine cl: collisionLines){
+            ArrayList<LineSegment> collided = cl.getCollidedLineSegments(particle);
+            if(!collided.isEmpty()) {
+                this.collided = collided;
+            }
+        }
 
         this.repaint();
     }

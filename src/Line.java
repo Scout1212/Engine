@@ -38,8 +38,8 @@ public class Line {
         g2d.setStroke(new BasicStroke(thickness));
         g2d.setColor(color);
 
-        for(int i = 0; i < lineSegments.size(); i++){
-            lineSegments.get(i).drawSelf(g2d);
+        for (LineSegment lineSegment : lineSegments) {
+            lineSegment.drawSelf(g2d);
         }
     }
 
@@ -68,6 +68,7 @@ public class Line {
         ArrayList<LineSegment> collidedSegments = new ArrayList<>();
         for(LineSegment lineSeg : lineSegments){
             if(lineSeg.isCollidingRigidBody(r1)) {
+                //System.out.println("collided");
                 collidedSegments.add(lineSeg);
             }
         }

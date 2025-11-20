@@ -28,4 +28,8 @@ public class Point {
     public double getY() {
         return y;
     }
+
+    public Point getPointInDirection(double length, double angle){
+        return new Point(x + length * Math.cos(angle),y + length * Math.sin(angle));
+    }
 }
