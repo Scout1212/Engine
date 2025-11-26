@@ -37,6 +37,7 @@ public class CollisionLine extends Line{
         return "CollisionLine with Segments: "  + collisionSegments.size() + " Holds " + parentLine.toString();
     }
 
+
     /**
      * I want to break free
      * @param line
@@ -48,8 +49,8 @@ public class CollisionLine extends Line{
 
         //my goal is to check the slopes of each segment and whichever segment is different
 
-        //find threshold later
-        double thresholdAngle = Math.toRadians(50);
+        //properly find the thresholdAngle later --> maybe if there are more line segments then threshold angle should increase to cut out more lines
+        double thresholdAngle = Math.toRadians(20);
 
         for(int i = 0; i < lineSegments.size() - 1; i++){
             //the current LineSegment for comparison
@@ -58,40 +59,54 @@ public class CollisionLine extends Line{
             //saving this point to use for the new line later
             Point start = currLineSeg.getStart();
 
-
             int j = i + 1;
             LineSegment compareLineSeg = lineSegments.get(j);
-
 
             //getting the second angle for comparison
             double compareSlopeAngle = compareLineSeg.getAngle();
             //getting the angle of the current lineSegment for comparison
             double currSlopeAngle = currLineSeg.getAngle();
 
-            //sliding window to compare the two line slopes
+            //when the difference between the two angles is less than a certain number (the angles are close in magnitude --> the slopes are similar)
+            //Then we want to keep going until we find the angle that is most different from the current lineSegment
             while(Math.abs(currSlopeAngle - compareSlopeAngle) < thresholdAngle && j < lineSegments.size()){
                 compareLineSeg = lineSegments.get(j);
                 compareSlopeAngle = compareLineSeg.getAngle();
-
-                System.out.println("CurrentSlope angle = " + currSlopeAngle + " CompareSlope angle = " + compareSlopeAngle + " Difference = " + (currSlopeAngle - compareSlopeAngle));
-
                 j++;
             }
-            //when we exit this while loop we will get the lineSegment with the different slope compared to the current line
 
+            //when we exit this while loop we will use the lineSegment with the different angle(slope) so we can end the collision segment at that lineSegment
             Point end = compareLineSeg.getEnd();
+
+            //If J was incremented (or j is not the next element)
+            if(j != i + 1){
+                //If we incremented j then we passed by a bunch of lineSegments with slopes similar to current line
+                //so we want to skip over them since they will already be included in a segment
+                i = j - 1;
+            }
+            else {
+                //If we did not increment j then compareLineSeg has a different slope so we do not want the end of it
+                end = currLineSeg.getEnd();
+
+                //going further --> keep in mind we do not want the end of compareLineSeg
+                //If we are at the last iteration of the outer loop and we are here (comment above) then we will skip the compareLineSeg(the last segment) and add currline segment instead
+                //but the outerloop wont make it to the last index of the lineSegments ArrayList and we will miss adding the last segment in this edge case
+                //this feels like band aid code but we will add it manually here
+                if(i == lineSegments.size() - 2){
+                    LineSegment lastLineSeg = lineSegments.getLast();
+                    ArrayList<LineSegment> sublineLast = new ArrayList<>();
+                    sublineLast.add(lastLineSeg);
+                    Line sublineLastLine = new Line(sublineLast, 3);
+                    collisionSegments.add(new CollisionSegment(lastLineSeg.getStart(), lastLineSeg.getEnd(), sublineLastLine));
+                }
+            }
 
             //generating the subline (part of the line) to give to the collisionSegment
             ArrayList<LineSegment> subLineSegments = new ArrayList<>(lineSegments.subList(i, j));
             Line subLine = new Line(subLineSegments, 3);
 
-
+            //adding everything to the Collision segment then to the list to give to the collision line
             collisionSegments.add(new CollisionSegment(start, end, subLine));
-
-            if(j != i + 1){
-                //if we entered the while loop we want to skip right to where ever it left off
-                i = j - 1;
-            }
         }
 
         return collisionSegments;
@@ -142,8 +157,6 @@ public class CollisionLine extends Line{
         return new Rectangle(topLeft, topRight, bottomLeft, bottomRight);
     }
 
-    //at first this method just got if we collided --> it returned boolean
-    //but I realize eventually I might want to know what lineSegment I collided into to do some collision stuff with
     /**
      * The first level of collision checking, compares bounding boxes:
      * if touching, it passes down collision check to the next level:
@@ -151,8 +164,7 @@ public class CollisionLine extends Line{
      * @return Collided LineSegments, if no collision then empty ArrayList
      */
     public ArrayList<LineSegment> getCollidedLineSegments(Particle r){
-        //on this upper level do is colliding with rectangle
-        //if it is then do isCollisionSegment colliding with
+        //on this upper level do is colliding with rectangle --> refer to green comment above
         ArrayList<LineSegment> collidedSegments = new ArrayList<>();
 
         if(collisionRectangle.isOverlapping(r.getBoundingBox())){

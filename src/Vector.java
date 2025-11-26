@@ -4,15 +4,21 @@ public class Vector {
 
     private Point resultant;
     private double magnitude;
+    public double angle;
+    //everytime the resultant is changed the magnitude and angle need to be recalculated
+    //aka every base operation needs to call recalc vector since it will move the point() --> add subtract
+    //the magnitude and angle should never be altered themselves (for the most part)
 
     Vector(double x, double y) {
         resultant = new Point(x, y);
         magnitude = findHyp(x, y);
+        angle = Math.atan2(y, x);
     }
 
     Vector(double length, double angle, String a) {
         magnitude = length;
         resultant = new Point(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
+        this.angle = angle;
     }
 
     @Override
@@ -22,11 +28,17 @@ public class Vector {
 
     public void add(Vector v) {
         resultant.translate(v.resultant.getX(), v.resultant.getY());
-        magnitude = findHyp(resultant.getX(), resultant.getY());
+        recalculateVector();
     }
 
     public void sub(Vector v) {
        resultant.translate(-v.resultant.getX(), -v.resultant.getY());
+       recalculateVector();
+    }
+
+    public void recalculateVector(){
+        magnitude = findHyp(resultant.getX(), resultant.getY());
+        angle = Math.atan2(resultant.getY(), resultant.getX());
     }
 
     public double getX() {

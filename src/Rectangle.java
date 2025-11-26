@@ -4,16 +4,19 @@ import java.security.PublicKey;
 public class Rectangle {
     private Point centerPoint;
     private Point topRight, topLeft, bottomLeft, bottomRight;
-    private double length;
     private int width;
     private int height;
 
+    /**
+     * @param p1 Top left of the rectangle
+     */
     public Rectangle(Point p1, int width, int height){
         this.topLeft = p1;
         this.topRight = new Point(p1.getX() + width, p1.getY());
         this.bottomLeft = new Point(p1.getX(), p1.getY() + height);
         this.bottomRight = new Point(p1.getX() + width, p1.getY() + height);
         this.centerPoint = new Point(p1.getX() + width/2.0, p1.getY() + height/2.0);
+
         this.width = width;
         this.height = height;
     }
@@ -58,8 +61,8 @@ public class Rectangle {
         double dx = Math.abs(centerPoint.getX() - rc.getX());
         double dy = Math.abs(centerPoint.getY() - rc.getY());
 
-        return dx < (width + r.getWidth()) / 2 &&
-                dy < (height + r.getHeight()) / 2;
+        return dx < (width + r.getWidth()) / 2.0 &&
+                dy < (height + r.getHeight()) / 2.0;
     }
     public Rectangle getBiggerRectangleFromCenter(int inc){
         Point newTopLeft = new Point(topLeft.getX() - inc, topLeft.getY() - inc);

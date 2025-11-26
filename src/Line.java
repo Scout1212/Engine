@@ -1,10 +1,11 @@
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
 //line holds an arrayList of line segments
-public class Line {
+public class Line implements Serializable {
     //really only serves to draw the line --> maybe I can add other things
     //stuff that a rigidbody can interact with
     ArrayList<LineSegment> lineSegments;

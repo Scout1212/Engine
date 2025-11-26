@@ -37,8 +37,8 @@ public class TesterCollisionResolution extends JComponent implements KeyListener
         gui.addMouseMotionListener(this);
         particle = new Particle(30, 10);
         line = new Line();
-        line.addSegment(new LineSegment(new Point(100,200), new Point(200, 200)));
-        line.addSegment(new LineSegment(new Point(200,200), new Point(300, 250)));
+        line.addSegment(new LineSegment(new Point(0,200), new Point(200, 200)));
+        line.addSegment(new LineSegment(new Point(200,200), new Point(300, 150)));
 
         collisionLine = line.getCollisionLine();
 

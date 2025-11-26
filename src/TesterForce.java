@@ -68,8 +68,6 @@ public class TesterForce extends JComponent implements KeyListener, MouseListene
 
     public void mouseReleased(MouseEvent e) {
         //todo figure out where to inverse to account for inverted y axis in screen class --> why is it already accounted for and working?
-        //I didnt inverse anything so why work
-
         Point p1 = line[0];
         Point p2 = new Point(e.getX() - 2, e.getY() - 30);
         //calculating a line to apply force to the object

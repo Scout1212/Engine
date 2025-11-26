@@ -1,5 +1,7 @@
+import java.io.Serializable;
+
 //point class is just a point its a basic building block
-public class Point {
+public class Point implements Serializable{
     private double x;
     private double y;
 

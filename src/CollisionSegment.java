@@ -1,13 +1,22 @@
 import java.util.ArrayList;
 
-//The idea is that a ColllisionSegment is a rough version of the line segment
-//it holds a bunch of line segments but tries to generalize them into a couple lines
-//only when the ball gets close enough will it reveal the little segments and let the line through
+// A CollisionSegment is a rough approximation a part of the line.
+// It groups many small segments of line and generalizes them into a segment.
+// When the object gets close, it reveals the small segments to do stuff with them
 public class CollisionSegment extends LineSegment {
     private Line subLine;
+    private double distanceToFurthestPoint;
     public CollisionSegment(Point p1, Point p2, Line subline) {
         super(p1, p2);
         this.subLine = subline;
+        this.distanceToFurthestPoint = findDistanceToFurthestPoint(subLine);
+    }
+
+    @Override
+    public boolean isCollidingRigidBody(Particle r) {
+        //What this does it makes a circle around the point on the line which extends to the furthest point on the sub line so
+        //it will account for any collisions where the ball collides with the subline but not directly with the collision line segment
+        return distanceToPoint(r.getCenter()) < (r.getDiam()/2.0) + distanceToFurthestPoint;
     }
 
     /**
@@ -18,12 +27,25 @@ public class CollisionSegment extends LineSegment {
     public ArrayList<LineSegment> getCollidedLineSegment(Particle r) {
         ArrayList<LineSegment> collidedSegment = new ArrayList<>();
 
-        if(super.isCollidingRigidBody(r)){
+        if(isCollidingRigidBody(r)){
             collidedSegment.addAll(subLine.getCollidedLineSegments(r));
         }
 
         return collidedSegment;
     }
-    //todo when doing the calculation for line colliding into collision line --> its doing point and point collision with the point closest to the line, turn it into circle and point collision with the diameter being the
-    //distance between the point on the collision line and the furthest point on the actual line,
+
+    public double findDistanceToFurthestPoint(Line subLine){
+        double distanceToFurthestPoint = 0;
+        for(LineSegment ls: subLine.getLineSegments()){
+            for(Point point: ls.getPoints()){
+                //the end and start points
+                double distance = distanceToPoint(point);
+                if(distance > distanceToFurthestPoint){
+                    distanceToFurthestPoint = distance;
+                }
+            }
+        }
+
+        return distanceToFurthestPoint + 5;
+    }
 }

@@ -3,7 +3,6 @@ import java.util.ArrayList;
 
 public class Particle {
     public double getDiam;
-    //i could turn x and y into a point from point class but eh
     private Point position;
     private int diam;
     private Vector velocity;
@@ -13,26 +12,20 @@ public class Particle {
     private double mass;
     private double bounciness;
     private boolean drawForce = true;
-    
+
     Particle(int diam, int mass) {
         this.diam = diam;
         this.mass = mass;
-        position = new Point(200, 0);
-
+        position = new Point(200, 100);
         velocity = new Vector(0, 0);
         acceleration = new Vector(0, 0);
-
         fNet = new Vector(0, 0);
         forces = new ArrayList<>();
-
-        //I guess it's a little redundant to have the gravitational constant (an acceleration to turn it into a force then back into an acceleration)
-        //its needed for normal and other force
-
+        //for now gravity is positive but to keep it right in math I want to make it negative to make going towards the earth negative
+        //But I will do that later
+        //todo resolve
         forces.add(new Vector(0, mass * PhysConst.GRAVITY*.1));
-        //forces.add(new Vector(10, 0));
-
         bounciness = .9;
-
     }
 
     public String toString() {
@@ -101,23 +94,11 @@ public class Particle {
 
     public void resolveCollision(ArrayList<LineSegment> segments){
         LineSegment ls = segments.getFirst();
-        //seperateFromLine(ls);
-        //System.out.println(ls.getAngle());
         double angle = ls.getAngle();
-        //System.out.println(Math.toDegrees(-angle));
         System.out.println(velocity.getMagnitude());
         Vector rotatedVelocity = velocity.getRotateVector(-angle);
-        //System.out.println(rotatedVelocity);
-        //System.out.println(Math.toDegrees(rotatedVelocity.getAngle()));
         Vector RotatedReflectedVelocity = new Vector(rotatedVelocity.getX() * bounciness, rotatedVelocity.getY() * bounciness * -1);
         velocity = RotatedReflectedVelocity.getRotateVector(angle);
-        //System.out.println(velocity);
-    }
-
-    public void seperateFromLine(LineSegment ls){
-        double normalAngle = ls.getNormalAngle();
-        double distanceBetweenPointLine = ls.distanceToPoint(getCenter()) + 1;
-        setPosition(new Point(position.getX() + distanceBetweenPointLine * Math.cos(normalAngle), position.getY() - distanceBetweenPointLine * Math.sin(normalAngle)));
     }
 
     public void setPosition(Point p){
@@ -149,7 +130,8 @@ public class Particle {
     }
 
     public Rectangle getBoundingBox(){
-        return new Rectangle(new Point(position.getX() - diam/2.0, position.getY() - diam/2.0), diam * 2, diam *2);
+        Rectangle boundingBox = new Rectangle(position, diam, diam);
+        return boundingBox.getBiggerRectangleFromCenter(diam/2);
     }
 
 }

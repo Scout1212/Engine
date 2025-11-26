@@ -1,6 +1,7 @@
 import java.awt.*;
+import java.io.Serializable;
 
-public class LineSegment {
+public class LineSegment implements Serializable{
     private Point start;
     private Point end;
     private double slope;
@@ -55,7 +56,7 @@ public class LineSegment {
     }
 
     public boolean isCollidingRigidBody(Particle r) {
-       return distanceToPoint   (r.getCenter()) < r.getDiam()/2.0;
+       return distanceToPoint(r.getCenter()) < r.getDiam()/2.0;
     }
 
     /**
@@ -65,6 +66,8 @@ public class LineSegment {
         double m1 = l1.getSlope();
         double m2 = this.getSlope();
 
+        //should I turn this into math.atan2 probably not because I think this will probably only be used relatively and I wont need an absolute value
+        //for the quadrant
         return Math.atan(Math.abs((m1-m2)/(1+m1*m2)));
     }
 
@@ -99,6 +102,8 @@ public class LineSegment {
     public Point getEnd(){
         return end;
     }
-
+    public Point[] getPoints(){
+        return new Point[]{start, end};
+    }
 
 }
