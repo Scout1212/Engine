@@ -18,10 +18,9 @@ public class TesterCollisionResolution extends JComponent implements KeyListener
     private int WIDTH = 800;
     private int HEIGHT = 800;
 
-    private Line line;
-    private CollisionLine collisionLine;
-    private Particle particle = new Particle(100, 10);
-
+    private Particle particle;
+    private ArrayList<Line> lines;
+    private ArrayList<CollisionLine> collisionLines;
     public TesterCollisionResolution() {
         JFrame gui = new JFrame();
         gui.setDefaultCloseOperation(3);
@@ -36,17 +35,21 @@ public class TesterCollisionResolution extends JComponent implements KeyListener
         gui.addMouseListener(this);
         gui.addMouseMotionListener(this);
         particle = new Particle(30, 10);
-        line = new Line();
-        line.addSegment(new LineSegment(new Point(0,200), new Point(200, 200)));
-        line.addSegment(new LineSegment(new Point(200,200), new Point(300, 150)));
 
-        collisionLine = line.getCollisionLine();
+        //I should be able to make sure that the user cant load a file that is not an ArrayList<Line>
+        collisionLines = new ArrayList<>();
+        lines = (ArrayList<Line>)SaveManager.load();
 
-        /*
-        this is for later to do collision when a particle hits multiple lines
-        line.addSegment(new LineSegment(new Point(100,200), new Point(200, 400)));
-        line.addSegment(new LineSegment(new Point(200,400), new Point(300, 200)));
-         */
+        if(lines == null) {
+            lines = new ArrayList<>();
+        }
+
+        for(int i = 0; i < lines.size(); i++){
+            collisionLines.add(lines.get(i).getCollisionLine());
+        }
+
+
+
     }
 
     public void keyPressed(KeyEvent e) {
@@ -58,19 +61,29 @@ public class TesterCollisionResolution extends JComponent implements KeyListener
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         particle.drawSelf(g2d);
-        line.drawSelf(g2d);
+        for(Line line: lines){
+            line.drawSelf(g2d);
+        }
+
+        for(CollisionLine cl : collisionLines){
+            cl.drawSelf(g2d);
+        }
+
         g2d.setColor(Color.RED);
-        collisionLine.drawSelf(g2d);
+
 
     }
 
     public void loop() {
         particle.update();
 
-        ArrayList<LineSegment> collidedLineSegments = collisionLine.getCollidedLineSegments(particle);
-        if(!collidedLineSegments.isEmpty()) {
-            particle.resolveCollision(collidedLineSegments);
+        for(CollisionLine cl: collisionLines){
+            ArrayList<LineSegment> collidedLineSegments = cl.getCollidedLineSegments(particle);
+            if(!collidedLineSegments.isEmpty()) {
+                particle.resolveCollision(collidedLineSegments);
+            }
         }
+
 
         this.repaint();
     }

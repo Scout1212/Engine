@@ -21,7 +21,7 @@ public class TesterSaveLoadLine extends JComponent implements KeyListener, Mouse
 
     private ArrayList<Line> lines =  new ArrayList<>();
 
-    String fileName = null;
+    String filePath = null;
     public TesterSaveLoadLine() {
 
         //IF we have a save file we want to load it
@@ -29,9 +29,9 @@ public class TesterSaveLoadLine extends JComponent implements KeyListener, Mouse
         fileChooser.setCurrentDirectory(new File("." +"/LineSaves/"));
         int returnVal = fileChooser.showOpenDialog(null);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
-            fileName = fileChooser.getSelectedFile().getAbsolutePath();
+            filePath = fileChooser.getSelectedFile().getAbsolutePath();
             try {
-                InputStream inputStream = new FileInputStream(fileName);
+                InputStream inputStream = new FileInputStream(filePath);
                 ObjectInputStream objectStream = new ObjectInputStream(inputStream);
                 lines = (ArrayList<Line>) objectStream.readObject();
                 objectStream.close();
@@ -59,12 +59,14 @@ public class TesterSaveLoadLine extends JComponent implements KeyListener, Mouse
 
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            if(fileName == null) {
-                fileName = JOptionPane.showInputDialog("What would you like to name your save file?") + ".obj";
+            if(filePath == null) {
+                String fileName = JOptionPane.showInputDialog("What would you like to name your save file?") + ".obj";
+                filePath = "LineSaves/" + fileName;
             }
 
             try {
-                FileOutputStream fileOutputStream = new FileOutputStream("LineSaves/"+fileName);
+                System.out.println("Saving to: " + filePath);
+                FileOutputStream fileOutputStream = new FileOutputStream(filePath);
                 ObjectOutputStream objOutputStream = new ObjectOutputStream(fileOutputStream);
                 objOutputStream.writeObject(lines);
                 objOutputStream.close();
