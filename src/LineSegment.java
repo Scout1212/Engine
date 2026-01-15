@@ -20,7 +20,7 @@ public class LineSegment implements Serializable{
 
     //I decided to make this double since I need it to be that way for my get priority queue method to work
     //It also maybe make sense since this is a just a formula only doing calculations
-    public double distanceToPoint(Point p1) {
+    public double getDistanceToPoint(Point p1) {
         //we want to make a triangle to check if the angles are acute
 
         //the line segment
@@ -37,15 +37,16 @@ public class LineSegment implements Serializable{
         //I know the length of all the sides so I can use law of cosines
 
         //this is my law of cosine formula solved for a theta
-        double aTheta = Math.acos((aSquare - cSquare - bSquare)/(-2*c*b));
-        double bTheta = Math.acos((bSquare - cSquare - aSquare)/(-2*c*a));
+        double aTheta = Math.toDegrees(Math.acos((aSquare - cSquare - bSquare)/(-2*c*b)));
+        double bTheta = Math.toDegrees(Math.acos((bSquare - cSquare - aSquare)/(-2*c*a)));
 
         //if either angle is obtuse that means p1 is not between the points of the line segment and so the distance
         //to the line segment is just a simple p1 to the side thats obtuse or right --> just draw it out
-        if(aTheta >= Math.PI/2){
+
+        if(aTheta >= 90){
             return b;
         }
-        else if(bTheta >= Math.PI/2){
+        else if(bTheta >= 90){
             return a;
         }
         else{
@@ -56,7 +57,9 @@ public class LineSegment implements Serializable{
     }
 
     public boolean isCollidingRigidBody(Particle r) {
-       return distanceToPoint(r.getCenter()) < r.getDiam()/2.0;
+        //todo there seems to be a problem here when it comes to deteecting collisions --> its detecting the ball is closer than it visually is
+        //another thing is that an arraylist
+       return getDistanceToPoint(r.getCenter()) < r.getDiam()/2.0;
     }
 
     /**
@@ -68,7 +71,7 @@ public class LineSegment implements Serializable{
 
         //should I turn this into math.atan2 probably not because I think this will probably only be used relatively and I wont need an absolute value
         //for the quadrant
-        return Math.atan(Math.abs((m1-m2)/(1+m1*m2)));
+        return Math.toDegrees(Math.atan(Math.abs((m1-m2)/(1+m1*m2))));
     }
 
 
@@ -77,11 +80,11 @@ public class LineSegment implements Serializable{
     }
 
     public double getAngle(){
-        return Math.atan2(end.getY() - start.getY(), end.getX() - start.getX());
+        return Math.toDegrees(Math.atan2(end.getY() - start.getY(), end.getX() - start.getX()));
     }
 
     public double getNormalAngle(){
-        return (getAngle() + Math.PI/2) % (2*Math.PI);
+        return Math.toDegrees((getAngle() + Math.PI/2) % (2*Math.PI));
     }
 
     public double getPerpendicular(){
@@ -93,7 +96,7 @@ public class LineSegment implements Serializable{
     }
 
     public double getDistance(){
-        return distance;
+        return start.distance(end);
     }
 
     public Point getStart(){

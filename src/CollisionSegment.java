@@ -6,6 +6,7 @@ import java.util.ArrayList;
 public class CollisionSegment extends LineSegment {
     private Line subLine;
     private double distanceToFurthestPoint;
+
     public CollisionSegment(Point p1, Point p2, Line subline) {
         super(p1, p2);
         this.subLine = subline;
@@ -16,7 +17,7 @@ public class CollisionSegment extends LineSegment {
     public boolean isCollidingRigidBody(Particle r) {
         //What this does it makes a circle around the point on the line which extends to the furthest point on the sub line so
         //it will account for any collisions where the ball collides with the subline but not directly with the collision line segment
-        return distanceToPoint(r.getCenter()) < (r.getDiam()/2.0) + distanceToFurthestPoint;
+        return getDistanceToPoint(r.getCenter()) < (r.getDiam()/2.0) + distanceToFurthestPoint;
     }
 
     /**
@@ -39,7 +40,7 @@ public class CollisionSegment extends LineSegment {
         for(LineSegment ls: subLine.getLineSegments()){
             for(Point point: ls.getPoints()){
                 //the end and start points
-                double distance = distanceToPoint(point);
+                double distance = getDistanceToPoint(point);
                 if(distance > distanceToFurthestPoint){
                     distanceToFurthestPoint = distance;
                 }

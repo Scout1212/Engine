@@ -9,15 +9,17 @@ public class Vector {
     //aka every base operation needs to call recalc vector since it will move the point() --> add subtract
     //the magnitude and angle should never be altered themselves (for the most part)
 
+    //todo fix the things with the angles --> I want to turn them all back to degrees
+
     Vector(double x, double y) {
         resultant = new Point(x, y);
         magnitude = findHyp(x, y);
-        angle = Math.atan2(y, x);
+        angle = Math.toDegrees(Math.atan2(y, x));
     }
 
     Vector(double length, double angle, String a) {
         magnitude = length;
-        resultant = new Point(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
+        resultant = new Point(magnitude * Math.cos(Math.toRadians(angle)), magnitude * Math.sin(Math.toRadians(angle)));
         this.angle = angle;
     }
 
@@ -38,7 +40,7 @@ public class Vector {
 
     public void recalculateVector(){
         magnitude = findHyp(resultant.getX(), resultant.getY());
-        angle = Math.atan2(resultant.getY(), resultant.getX());
+        angle = Math.toDegrees(Math.atan2(resultant.getY(), resultant.getX()));
     }
 
     public double getX() {
@@ -50,10 +52,10 @@ public class Vector {
     }
 
     /***
-     * @return the angle of above the horizonal in radians
+     * @return the angle of above the horizonal in degrees
      */
     public double getAngle(){
-        return Math.atan2(resultant.getY(), resultant.getX());
+        return Math.toDegrees(Math.atan2(resultant.getY(), resultant.getX()));
     }
 
     public double getMagnitude(){

@@ -66,6 +66,7 @@ public class TesterCollisionResolution extends JComponent implements KeyListener
         }
 
         for(CollisionLine cl : collisionLines){
+            g2d.setColor(Color.red);
             cl.drawSelf(g2d);
         }
 
@@ -82,6 +83,9 @@ public class TesterCollisionResolution extends JComponent implements KeyListener
             if(!collidedLineSegments.isEmpty()) {
                 particle.resolveCollision(collidedLineSegments);
             }
+            else{
+                //todo remove the forces here
+            }
         }
 
 
@@ -95,10 +99,19 @@ public class TesterCollisionResolution extends JComponent implements KeyListener
 
     }
 
+
+    int timer = 0;
+
     public void mousePressed(MouseEvent e) {
+        timer = 0;
+        lines.add(new Line());
     }
 
     public void mouseReleased(MouseEvent e) {
+        collisionLines.add(lines.getLast().getCollisionLine());
+
+        endPoint = null;
+        startPoint = null;
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -114,7 +127,25 @@ public class TesterCollisionResolution extends JComponent implements KeyListener
 
     }
 
+    Point startPoint;
+    Point endPoint;
+
     public void mouseDragged(MouseEvent e) {
+        if (timer % 4 == 0) {
+            //if point is not initialized do it, if it is do the other, if they are both init then make a line segment then reset point values
+            if (startPoint == null) {
+                startPoint = new Point(e.getX() - 2, e.getY() - 30);
+            } else if (endPoint == null) {
+                endPoint = new Point(e.getX() - 2, e.getY() - 30);
+                LineSegment currentLineSeg = new LineSegment(startPoint, endPoint);
+                lines.getLast().addSegment(currentLineSeg);
+
+                startPoint = endPoint;
+                endPoint = null;
+            }
+        }
+
+        timer++;
     }
 
     public void start(final int ticks) {

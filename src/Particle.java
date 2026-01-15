@@ -2,13 +2,13 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Particle {
-    public double getDiam;
+
+    //convert "forces" into force class
     private Point position;
     private int diam;
     private Vector velocity;
     private Vector acceleration;
-    private Vector fNet;
-    private ArrayList<Vector> forces;
+    private ArrayList<Force> forces;
     private double mass;
     private double bounciness;
     private boolean drawForce = true;
@@ -19,12 +19,11 @@ public class Particle {
         position = new Point(200, 100);
         velocity = new Vector(0, 0);
         acceleration = new Vector(0, 0);
-        fNet = new Vector(0, 0);
         forces = new ArrayList<>();
         //for now gravity is positive but to keep it right in math I want to make it negative to make going towards the earth negative
         //But I will do that later
         //todo resolve
-        forces.add(new Vector(0, mass * PhysConst.GRAVITY*.1));
+        forces.add(new Force(new Vector(0, mass * PhysConst.GRAVITY*.1), "Gravity"));
         bounciness = .9;
     }
 
@@ -51,14 +50,15 @@ public class Particle {
         double cY = getCenterY();
 
 
-        for(Vector f : forces){
-            VisualVector visualVector = f.getVisualVector();
+        for(Force f : forces){
+            VisualVector visualVector = f.getVector().getVisualVector();
             g2d.drawLine((int)cX, (int)cY, (int)(cX + visualVector.getX()), (int)(cY + visualVector.getY()));
         }
 
         g2d.setColor(Color.blue);
 
-        VisualVector visualVector = fNet.getVisualVector();
+        Force fNet = Force.sumForces(forces, "Net");
+        VisualVector visualVector = fNet.getVector().getVisualVector();
         g2d.drawLine((int)cX, (int)cY, (int)(cX + visualVector.getX()), (int)(cY + visualVector.getY()));
     }
 
@@ -69,9 +69,6 @@ public class Particle {
         position.translate(velocity.getX(), velocity.getY());
     }
 
-    private void findFNet(){
-        fNet = Vector.sumVectors(forces);
-    }
 
     public double getCenterX(){
         return position.getX() + diam/2.0;
@@ -81,32 +78,51 @@ public class Particle {
     }
 
     private void findAcceleration(){
-        findFNet();
-        //a = f/m
-        acceleration = new Vector(fNet.getX()/mass, fNet.getY()/mass);
-    }
+        Force fNet = Force.sumForces(forces, "Net");
 
-    public Point getNextPosition(){
-        Point nextPosition = position;
-        nextPosition.translate(velocity.getX(), velocity.getY());
-        return nextPosition;
+        //a = f/m
+        acceleration = Force.findAcceleration(fNet, mass);
     }
 
     public void resolveCollision(ArrayList<LineSegment> segments){
+        //resolveOverlap(segments.getFirst());
+
+        //todo do slide acceleration --> when velocity while touching the ramp is zero or parallel to the ramp
         LineSegment ls = segments.getFirst();
-        double angle = ls.getAngle();
-        System.out.println(velocity.getMagnitude());
-        Vector rotatedVelocity = velocity.getRotateVector(-angle);
-        Vector RotatedReflectedVelocity = new Vector(rotatedVelocity.getX() * bounciness, rotatedVelocity.getY() * bounciness * -1);
-        velocity = RotatedReflectedVelocity.getRotateVector(angle);
+        double lineSegAng1 = ls.getAngle();
+        double lineSegAng2 = lineSegAng1 + 180;
+
+        double velAngle = velocity.getAngle();
+
+
+        //boolean parallel = Math.abs(lineSegAng1 - lineSegAng2) < 5 || Math.abs(lineSegAng1 - velAngle) < 5;
+        //if(!parallel) {
+
+            Vector rotatedVelocity = velocity.getRotateVector(-lineSegAng1);
+            Vector RotatedReflectedVelocity = new Vector(rotatedVelocity.getX() * bounciness, rotatedVelocity.getY() * bounciness * -1);
+            velocity = RotatedReflectedVelocity.getRotateVector(lineSegAng1);
+        //}
+        //else if(Math.sin(velocity.getAngle()) < 0) {
+            //forces.add(new Force(new Vector(0, -mass * PhysConst.GRAVITY * Math.cos(Math.toRadians(lineSegAng1))), "Gravity Perpendicular"));
+            //forces.add(new Force(new Vector(0, mass * PhysConst.GRAVITY * Math.sin(Math.toRadians(lineSegAng1))), "Gravity Parallel"));
+        //}
+    }
+
+    public void resolveOverlap(LineSegment ls){
+        double distance = ls.getDistanceToPoint(getCenter());
+        double perpendicularAngle = ls.getPerpendicular();
+
+        Vector moveVector = new Vector(distance, perpendicularAngle, "");
+
+        position.translate(moveVector.getX(), moveVector.getY());
     }
 
     public void setPosition(Point p){
         position = p;
     }
 
-    public void addForce(Vector v){
-        forces.add(v);
+    public void addForce(Force f){
+        forces.add(f);
     }
 
     private void removeForce(Vector v){
@@ -132,6 +148,13 @@ public class Particle {
     public Rectangle getBoundingBox(){
         Rectangle boundingBox = new Rectangle(position, diam, diam);
         return boundingBox.getBiggerRectangleFromCenter(diam/2);
+    }
+
+    public void printForces(){
+        for(Force f : forces){
+            System.out.print(f.getName() + " ");
+        }
+        System.out.println();
     }
 
 }

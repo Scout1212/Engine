@@ -69,7 +69,6 @@ public class Line implements Serializable {
         ArrayList<LineSegment> collidedSegments = new ArrayList<>();
         for(LineSegment lineSeg : lineSegments){
             if(lineSeg.isCollidingRigidBody(r1)) {
-                //System.out.println("collided");
                 collidedSegments.add(lineSeg);
             }
         }

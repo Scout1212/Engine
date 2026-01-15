@@ -52,6 +52,8 @@ public class TesterForce extends JComponent implements KeyListener, MouseListene
     public void loop() {
         particle.update();
 
+        particle.printForces();
+
         this.repaint();
     }
 
@@ -66,6 +68,7 @@ public class TesterForce extends JComponent implements KeyListener, MouseListene
         line = new Point[]{new Point(e.getX() - 2, e.getY() - 30), new Point(e.getX() - 2, e.getY() - 30)};
     }
 
+    int counter = 1;
     public void mouseReleased(MouseEvent e) {
         //todo figure out where to inverse to account for inverted y axis in screen class --> why is it already accounted for and working?
         Point p1 = line[0];
@@ -74,7 +77,8 @@ public class TesterForce extends JComponent implements KeyListener, MouseListene
 
 
         VisualVector mouseForceVector = new VisualVector((int)(p2.getX() - p1.getX()), (int)(p2.getY() - p1.getY()));
-        particle.addForce(mouseForceVector.getVector());
+        particle.addForce(new Force(mouseForceVector.getVector(), "Mouse Force " + counter));
+        counter++;
         line = null;
     }
 

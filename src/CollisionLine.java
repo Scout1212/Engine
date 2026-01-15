@@ -23,13 +23,14 @@ public class CollisionLine extends Line{
 
     @Override
     public void drawSelf(Graphics2D g2d) {
-        g2d.setColor(Color.RED);
         for(CollisionSegment collisionSegment : collisionSegments){
             collisionSegment.drawSelf(g2d);
         }
 
-        g2d.setColor(Color.blue);
-        collisionRectangle.drawSelf(g2d, false);
+        //todo put back
+
+        //g2d.setColor(Color.blue);
+        //collisionRectangle.drawSelf(g2d, false);
     }
 
     @Override
@@ -68,15 +69,18 @@ public class CollisionLine extends Line{
             double currSlopeAngle = currLineSeg.getAngle();
 
             //when the difference between the two angles is less than a certain number (the angles are close in magnitude --> the slopes are similar)
-            //Then we want to keep going until we find the angle that is most different from the current lineSegment
+            //Then we want to keep going until we find the angle that is different from the current lineSegment
             while(Math.abs(currSlopeAngle - compareSlopeAngle) < thresholdAngle && j < lineSegments.size()){
                 compareLineSeg = lineSegments.get(j);
                 compareSlopeAngle = compareLineSeg.getAngle();
                 j++;
             }
 
-            //when we exit this while loop we will use the lineSegment with the different angle(slope) so we can end the collision segment at that lineSegment
+            //when we exit this while loop we will use the lineSegment with the different angle(slope) so we can end the collision segment at the end of that lineSegment
             Point end = compareLineSeg.getEnd();
+
+            int startIndex = i;
+            int endIndex = j;
 
             //If J was incremented (or j is not the next element)
             if(j != i + 1){
@@ -102,7 +106,7 @@ public class CollisionLine extends Line{
             }
 
             //generating the subline (part of the line) to give to the collisionSegment
-            ArrayList<LineSegment> subLineSegments = new ArrayList<>(lineSegments.subList(i, j));
+            ArrayList<LineSegment> subLineSegments = new ArrayList<>(lineSegments.subList(startIndex, endIndex));
             Line subLine = new Line(subLineSegments, 3);
 
             //adding everything to the Collision segment then to the list to give to the collision line
